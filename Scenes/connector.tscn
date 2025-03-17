@@ -1,0 +1,44 @@
+[gd_scene load_steps=4 format=3 uid="uid://dic23rle6vmhy"]
+
+[ext_resource type="Script" path="res://Scenes/Connector.cs" id="1_7r36h"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dbcde"]
+size = Vector2(2, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jxtr4"]
+size = Vector2(2, 48)
+
+[node name="Connector" type="Node2D"]
+script = ExtResource("1_7r36h")
+
+[node name="RightColorRect" type="ColorRect" parent="."]
+offset_left = 336.0
+offset_top = -36.0
+offset_right = 356.0
+offset_bottom = 12.0
+color = Color(0, 0, 0, 1)
+
+[node name="Area2D" type="Area2D" parent="RightColorRect"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightColorRect/Area2D"]
+position = Vector2(1, 24)
+shape = SubResource("RectangleShape2D_dbcde")
+
+[node name="LeftColorRect" type="ColorRect" parent="."]
+offset_left = -356.0
+offset_top = -36.0
+offset_right = -336.0
+offset_bottom = 12.0
+color = Color(0, 0, 0, 1)
+
+[node name="Area2D" type="Area2D" parent="LeftColorRect"]
+position = Vector2(20, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftColorRect/Area2D"]
+position = Vector2(-1, 24)
+shape = SubResource("RectangleShape2D_jxtr4")
+
+[connection signal="body_entered" from="RightColorRect/Area2D" to="." method="OnRightBodyEntered"]
+[connection signal="body_exited" from="RightColorRect/Area2D" to="." method="OnRightBodyExited"]
+[connection signal="body_entered" from="LeftColorRect/Area2D" to="." method="OnLeftBodyEntered"]
+[connection signal="body_exited" from="LeftColorRect/Area2D" to="." method="OnLeftBodyExited"]

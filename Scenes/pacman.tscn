@@ -1,0 +1,73 @@
+[gd_scene load_steps=10 format=3 uid="uid://ble10bjfxmw0o"]
+
+[ext_resource type="Script" path="res://Scenes/Pacman.cs" id="1_3stom"]
+[ext_resource type="Texture2D" uid="uid://h71ud3s8c8n3" path="res://Assets/Pacman/Pacman_02.png" id="1_boqhi"]
+[ext_resource type="Texture2D" uid="uid://c6bux70f56d6a" path="res://Assets/Pacman/direction_pointer.png" id="3_n3bqb"]
+[ext_resource type="Texture2D" uid="uid://bh35fl0wqe63" path="res://Assets/Pacman/Pacman_01.png" id="4_48koy"]
+[ext_resource type="Texture2D" uid="uid://dn5n35q1uw6no" path="res://Assets/Pacman/Pacman_03.png" id="5_8oyyt"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lrdre"]
+radius = 7.02363
+
+[sub_resource type="Animation" id="Animation_nudao"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_boqhi")]
+}
+
+[sub_resource type="Animation" id="Animation_0yby8"]
+resource_name = "default"
+length = 0.45
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [ExtResource("4_48koy"), ExtResource("1_boqhi"), ExtResource("5_8oyyt")]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_f120j"]
+_data = {
+"RESET": SubResource("Animation_nudao"),
+"default": SubResource("Animation_0yby8")
+}
+
+[node name="Player" type="CharacterBody2D"]
+position = Vector2(0, -1)
+scale = Vector2(3.42, 3.42)
+script = ExtResource("1_3stom")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(-1, -1)
+texture = ExtResource("1_boqhi")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_lrdre")
+
+[node name="DirectionPointer" type="Sprite2D" parent="."]
+visible = false
+texture_filter = 1
+position = Vector2(-10, 0)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("3_n3bqb")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_f120j")
+}
