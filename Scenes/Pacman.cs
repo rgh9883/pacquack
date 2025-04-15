@@ -55,16 +55,16 @@ public partial class Pacman : CharacterBody2D {
 
     public void turnSprite(){
         if (next_movement_direction == Vector2.Left) {
-            RotationDegrees = 0;
-        }
-        else if (next_movement_direction == Vector2.Right){
             RotationDegrees = 180;
         }
+        else if (next_movement_direction == Vector2.Right){
+            RotationDegrees = 0;
+        }
         else if (next_movement_direction == Vector2.Down){
-            RotationDegrees = 270;
+            RotationDegrees = 90;
         }
         else if (next_movement_direction == Vector2.Up){
-            RotationDegrees = 90;
+            RotationDegrees = 270;
         }
     }
 

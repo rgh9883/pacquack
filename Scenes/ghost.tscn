@@ -1,26 +1,82 @@
-[gd_scene load_steps=5 format=3 uid="uid://dl17o1sskensj"]
+[gd_scene load_steps=14 format=3 uid="uid://dl17o1sskensj"]
 
 [ext_resource type="Script" path="res://Scenes/Ghost.cs" id="1_s1kw0"]
 [ext_resource type="Texture2D" uid="uid://bwh3pnp6rcycn" path="res://Assets/Ghost/Ghost_Body_01.png" id="1_vc1v5"]
 [ext_resource type="Texture2D" uid="uid://gcljnvys5tll" path="res://Assets/Ghost/Ghost_Eyes_Down.png" id="2_patml"]
+[ext_resource type="Script" path="res://Scenes/GhostBodySprite.cs" id="3_k5tgj"]
+[ext_resource type="Texture2D" uid="uid://k486j4lctjb7" path="res://Assets/Ghost/Ghost_Body_02.png" id="5_cyyg2"]
+[ext_resource type="Script" path="res://Scenes/GhostEyesSprite.cs" id="5_wmt3p"]
+[ext_resource type="Texture2D" uid="uid://dcgg14tac7mou" path="res://Assets/Ghost/Ghost_Eyes_Up.png" id="6_ethgl"]
+[ext_resource type="Texture2D" uid="uid://cvgpjfpg6poi1" path="res://Assets/Ghost/Ghost_Eyes_Left.png" id="7_5cmr5"]
+[ext_resource type="Texture2D" uid="uid://dw3xx2kpcbjrs" path="res://Assets/Ghost/Ghost_Eyes_Right.png" id="8_qckxs"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lpl38"]
 radius = 7.0
 
+[sub_resource type="Animation" id="Animation_sx20b"]
+resource_name = "moving"
+length = 0.5
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BodySprite:texture")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [ExtResource("1_vc1v5"), ExtResource("5_cyyg2")]
+}
+
+[sub_resource type="Animation" id="Animation_2qeaw"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BodySprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_vc1v5")]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_q7qcm"]
+_data = {
+"RESET": SubResource("Animation_2qeaw"),
+"moving": SubResource("Animation_sx20b")
+}
+
 [node name="Ghost" type="Area2D"]
 script = ExtResource("1_s1kw0")
 
-[node name="Body_Sprite" type="Sprite2D" parent="."]
+[node name="BodySprite" type="Sprite2D" parent="."]
 texture_filter = 1
 texture = ExtResource("1_vc1v5")
+script = ExtResource("3_k5tgj")
 
-[node name="Eyes_Sprite" type="Sprite2D" parent="."]
+[node name="EyesSprite" type="Sprite2D" parent="."]
 texture_filter = 1
 texture = ExtResource("2_patml")
+script = ExtResource("5_wmt3p")
+up = ExtResource("6_ethgl")
+down = ExtResource("2_patml")
+left = ExtResource("7_5cmr5")
+right = ExtResource("8_qckxs")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_lpl38")
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_q7qcm")
+}
 
 [connection signal="navigation_finished" from="NavigationAgent2D" to="." method="OnPositionReached"]

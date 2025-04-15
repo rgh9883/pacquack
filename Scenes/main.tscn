@@ -1337,11 +1337,12 @@ position = Vector2(300, 204)
 
 [node name="Ghosts" type="Node" parent="."]
 
-[node name="Ghost" parent="Ghosts" node_paths=PackedStringArray("tile_map") instance=ExtResource("8_48p15")]
+[node name="RedGhost" parent="Ghosts" node_paths=PackedStringArray("tile_map") instance=ExtResource("8_48p15")]
 position = Vector2(0, -84)
 scale = Vector2(3, 3)
 movement_targets = ExtResource("9_xm3mg")
 tile_map = NodePath("../../TileMap")
+color = Color(1, 0, 0, 1)
 
 [node name="Targets" type="Node" parent="."]
 
