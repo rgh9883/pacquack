@@ -6,6 +6,7 @@ public partial class PelletsManager : Node {
 	int total_pellets_count;
 
 	int pellets_eaten = 0;
+	[Export] Ghost[] ghosts;
 
 	[Signal] public delegate void AllPelletsEatenEventHandler();
 
@@ -22,8 +23,14 @@ public partial class PelletsManager : Node {
 	public override void _Process(double delta) {
 	}
 
-	private void OnPelletEaten() {
+	private void OnPelletEaten(bool can_eat_ghosts) {
 		pellets_eaten++;
+		if(can_eat_ghosts) {
+			foreach(Ghost ghost in ghosts) {
+				ghost.runAway();
+			}
+		}
+
 		if(pellets_eaten == total_pellets_count) {
 			EmitSignal(nameof(AllPelletsEaten));
 			return;

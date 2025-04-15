@@ -9,6 +9,7 @@ size = Vector2(24, 24)
 [node name="Large_Pellet" type="Area2D"]
 collision_layer = 8
 script = ExtResource("1_5bc27")
+can_eat_ghosts = true
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1

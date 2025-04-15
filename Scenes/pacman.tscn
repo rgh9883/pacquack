@@ -50,6 +50,7 @@ _data = {
 [node name="Player" type="CharacterBody2D"]
 position = Vector2(0, -1)
 scale = Vector2(3.42, 3.42)
+collision_mask = 30
 script = ExtResource("1_3stom")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

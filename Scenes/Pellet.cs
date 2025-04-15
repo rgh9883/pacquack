@@ -2,9 +2,9 @@ using Godot;
 using System;
 
 public partial class Pellet : Area2D {
-	[Export] bool should_allow_eating_ghosts = false;
+	[Export] bool can_eat_ghosts;
 	
-	[Signal] public delegate void PelletEatenEventHandler();
+	[Signal] public delegate void PelletEatenEventHandler(bool can_eat_ghosts);
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
@@ -16,11 +16,8 @@ public partial class Pellet : Area2D {
 
 	private void OnBodyEntered(Node body) {
 		if(body is Pacman) {
-			EmitSignal(nameof(PelletEaten));
+			EmitSignal(nameof(PelletEaten), can_eat_ghosts);
             QueueFree();
-			if(should_allow_eating_ghosts) {
-				return;
-			}
 		}
 	}
 

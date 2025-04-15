@@ -28,4 +28,12 @@ public partial class GhostEyesSprite : Sprite2D {
 	private void OnDirectionChange(string new_direction) {
 		Texture = directions[new_direction];
 	}
+
+	public void hideEyes() {
+		Hide();
+	}
+
+	public void showEyes() {
+		Show();
+	}
 }
