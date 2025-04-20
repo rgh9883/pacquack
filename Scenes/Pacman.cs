@@ -73,5 +73,10 @@ public partial class Pacman : CharacterBody2D {
         var result = GetWorld2D().DirectSpaceState.IntersectShape(shape_query);
         return result.Count() == 0;
     }
+
+    public void die() {
+        SetProcess(false);
+        animation_player.Play("death");
+    }
 }
 

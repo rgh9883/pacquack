@@ -7,6 +7,7 @@ public partial class PelletsManager : Node {
 
 	int pellets_eaten = 0;
 	[Export] Ghost[] ghosts;
+	[Export] PointsManager pts_manager;
 
 	[Signal] public delegate void AllPelletsEatenEventHandler();
 
@@ -26,6 +27,7 @@ public partial class PelletsManager : Node {
 	private void OnPelletEaten(bool can_eat_ghosts) {
 		pellets_eaten++;
 		if(can_eat_ghosts) {
+			pts_manager.pts_per_ghost = 200;
 			foreach(Ghost ghost in ghosts) {
 				ghost.runAway();
 			}

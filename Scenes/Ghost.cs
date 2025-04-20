@@ -1,21 +1,25 @@
 using Godot;
 using System;
+using System.Threading.Tasks;
 
 public partial class Ghost : Area2D {
 
 	int cur_scatter_index = 0;
 
 	[Export] int speed = 120;
+	[Export] int eaten_speed = 240;
 	[Export] movement_targets movement_targets;
 	[Export] TileMap tile_map;
 	[Export] public Color color;
 	[Export] Node2D chase_target;
+	[Export] PointsManager pts_manager;
 	[Signal] public delegate void DirectionChangeEventHandler(string cur_direction);
 
 	enum GhostState {
 		SCATTER,
 		CHASE,
-		RUNAWAY
+		RUNAWAY,
+		EATEN
 	}
 
 	private NavigationAgent2D navigation_agent;
@@ -26,7 +30,9 @@ public partial class Ghost : Area2D {
 	private Timer runaway_timer;
 	private GhostBodySprite body;
 	private GhostEyesSprite eyes;
+	private Label points;
 	private bool is_blinking = false;
+	private bool no_moving = false;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
@@ -41,6 +47,8 @@ public partial class Ghost : Area2D {
 		body = GetNode<GhostBodySprite>("BodySprite");
 		eyes = GetNode<GhostEyesSprite>("EyesSprite");
 
+		points = GetNode<Label>("PointsLabel");
+
 		CallDeferred("setup");
 	}
 
@@ -49,20 +57,23 @@ public partial class Ghost : Area2D {
 		if(!runaway_timer.IsStopped() && runaway_timer.TimeLeft < runaway_timer.WaitTime / 3 && !is_blinking) {
 			startBlinking();
 		}
-		moveGhost(navigation_agent.GetNextPathPosition(), delta);
+		if(!no_moving) {
+			moveGhost(navigation_agent.GetNextPathPosition(), delta);
+		}
+		
 	}
 
 	private void moveGhost(Vector2 next_pos, double delta) {
 		Vector2 cur_agent_pos = GlobalPosition;
-
-		Vector2 new_velo = (next_pos - cur_agent_pos).Normalized() * speed * (float) delta;
+		int cur_speed = cur_state == GhostState.EATEN ? eaten_speed : speed;
+		Vector2 new_velo = (next_pos - cur_agent_pos).Normalized() * cur_speed * (float) delta;
 
 		Position += new_velo;
 
 		calcDirection(new_velo);
 	}
 
-	private void calcDirection(Vector2 velocity) {
+	private void calcDirection(Godot.Vector2 velocity) {
 		string cur_direction;
 		
 		if(velocity.X > 1) {
@@ -104,6 +115,10 @@ public partial class Ghost : Area2D {
 			GD.Print("KILL");
 		} else if(cur_state == GhostState.RUNAWAY) {
 			runAway();
+		} else if(cur_state == GhostState.EATEN) {
+			body.normal();
+			body.Show();
+			startChase();
 		}
 		
 	}
@@ -126,6 +141,9 @@ public partial class Ghost : Area2D {
 	}
 
 	public void runAway() {
+		if(cur_state == GhostState.EATEN) {
+			return;
+		}
 		if(runaway_timer.IsStopped()) {
 			runaway_timer.Start();
 			cur_state = GhostState.RUNAWAY;
@@ -146,10 +164,38 @@ public partial class Ghost : Area2D {
 	}
 
 	private void OnRunAwayTimeout() {
+		pts_manager.pts_per_ghost = 200;
 		is_blinking = false;
 		runaway_timer.Stop();
 		body.normal();
 		eyes.showEyes();
 		startChase();
+	}
+
+	private void OnBodyEntered(Node body) {
+		if(body is Pacman) {
+			if(cur_state == GhostState.RUNAWAY) {
+				getEaten();
+			} else if(cur_state == GhostState.SCATTER || cur_state == GhostState.CHASE) {
+				SetCollisionMaskValue(1, false);
+				update_chase.Stop();
+				((Pacman)body).die();
+				scatter_timer.WaitTime = 600;
+				scatter();
+			}
+		}
+
+	}
+
+	private async Task getEaten() {
+		body.Hide();
+		eyes.showEyes();
+		points.Text = pts_manager.pts_per_ghost.ToString();
+		points.Show();
+		await pts_manager.OnGhostEaten();
+		points.Hide();
+		runaway_timer.Stop();
+		cur_state = GhostState.EATEN;
+		navigation_agent.TargetPosition = movement_targets.at_home_targets[0].Position;
 	}
 }

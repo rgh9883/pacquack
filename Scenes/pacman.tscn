@@ -1,10 +1,21 @@
-[gd_scene load_steps=10 format=3 uid="uid://ble10bjfxmw0o"]
+[gd_scene load_steps=22 format=3 uid="uid://ble10bjfxmw0o"]
 
 [ext_resource type="Script" path="res://Scenes/Pacman.cs" id="1_3stom"]
 [ext_resource type="Texture2D" uid="uid://h71ud3s8c8n3" path="res://Assets/Pacman/Pacman_02.png" id="1_boqhi"]
 [ext_resource type="Texture2D" uid="uid://c6bux70f56d6a" path="res://Assets/Pacman/direction_pointer.png" id="3_n3bqb"]
 [ext_resource type="Texture2D" uid="uid://bh35fl0wqe63" path="res://Assets/Pacman/Pacman_01.png" id="4_48koy"]
 [ext_resource type="Texture2D" uid="uid://dn5n35q1uw6no" path="res://Assets/Pacman/Pacman_03.png" id="5_8oyyt"]
+[ext_resource type="Texture2D" uid="uid://bbgj23q7gam4f" path="res://Assets/Pacman/Pacman_Death_01.png" id="6_0meoa"]
+[ext_resource type="Texture2D" uid="uid://vxf8adm234y3" path="res://Assets/Pacman/Pacman_Death_02.png" id="7_w7gvo"]
+[ext_resource type="Texture2D" uid="uid://coy4joj7785kn" path="res://Assets/Pacman/Pacman_Death_03.png" id="8_tgh0f"]
+[ext_resource type="Texture2D" uid="uid://dc32pr4l0exr7" path="res://Assets/Pacman/Pacman_Death_04.png" id="9_1ysfh"]
+[ext_resource type="Texture2D" uid="uid://bghyra350hdga" path="res://Assets/Pacman/Pacman_Death_05.png" id="10_wy5o0"]
+[ext_resource type="Texture2D" uid="uid://bs55ta550rsj3" path="res://Assets/Pacman/Pacman_Death_06.png" id="11_xmrnd"]
+[ext_resource type="Texture2D" uid="uid://c3dh7n3hysm7o" path="res://Assets/Pacman/Pacman_Death_07.png" id="12_r1lom"]
+[ext_resource type="Texture2D" uid="uid://d30tk7uppyp8r" path="res://Assets/Pacman/Pacman_Death_08.png" id="13_2nxgh"]
+[ext_resource type="Texture2D" uid="uid://bm2447s8rp6kl" path="res://Assets/Pacman/Pacman_Death_09.png" id="14_4nfmi"]
+[ext_resource type="Texture2D" uid="uid://malqtxrid8h4" path="res://Assets/Pacman/Pacman_Death_10.png" id="15_byyhm"]
+[ext_resource type="Texture2D" uid="uid://2xj6ip5thdc6" path="res://Assets/Pacman/Pacman_Death_11.png" id="16_c31pa"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lrdre"]
 radius = 7.02363
@@ -41,9 +52,27 @@ tracks/0/keys = {
 "values": [ExtResource("4_48koy"), ExtResource("1_boqhi"), ExtResource("5_8oyyt")]
 }
 
+[sub_resource type="Animation" id="Animation_opfyu"]
+resource_name = "death"
+length = 2.5
+step = 1.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [ExtResource("6_0meoa"), ExtResource("7_w7gvo"), ExtResource("8_tgh0f"), ExtResource("9_1ysfh"), ExtResource("10_wy5o0"), ExtResource("11_xmrnd"), ExtResource("12_r1lom"), ExtResource("13_2nxgh"), ExtResource("14_4nfmi"), ExtResource("15_byyhm"), ExtResource("16_c31pa")]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_f120j"]
 _data = {
 "RESET": SubResource("Animation_nudao"),
+"death": SubResource("Animation_opfyu"),
 "default": SubResource("Animation_0yby8")
 }
 
