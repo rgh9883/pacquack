@@ -3,9 +3,6 @@ using System;
 using System.Threading.Tasks;
 
 public partial class Ghost : Area2D {
-
-	int cur_scatter_index = 0;
-
 	[Export] int speed = 120;
 	[Export] int eaten_speed = 240;
 	[Export] movement_targets movement_targets;
@@ -13,13 +10,17 @@ public partial class Ghost : Area2D {
 	[Export] public Color color;
 	[Export] Node2D chase_target;
 	[Export] PointsManager pts_manager;
+	[Export] bool start_at_home;
+	[Export] Timer start_timer;
+	[Export] Marker2D start_pos;
 	[Signal] public delegate void DirectionChangeEventHandler(string cur_direction);
 
 	enum GhostState {
 		SCATTER,
 		CHASE,
 		RUNAWAY,
-		EATEN
+		EATEN,
+		STARTING
 	}
 
 	private NavigationAgent2D navigation_agent;
@@ -33,6 +34,8 @@ public partial class Ghost : Area2D {
 	private Label points;
 	private bool is_blinking = false;
 	private bool no_moving = false;
+	private int cur_scatter_index = 0;
+	private int cur_home_index = 0;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
@@ -95,11 +98,23 @@ public partial class Ghost : Area2D {
 	private void setup() {
 		navigation_agent.SetNavigationMap(tile_map.GetNavigationMap(0));
 		NavigationServer2D.AgentSetMap(navigation_agent.GetRid(), tile_map.GetNavigationMap(0));
-		scatter_timer.Start();
-		scatter();
+		if(start_at_home) {
+			waitToStart();
+		} else {
+			scatter();
+		}
+	}
+
+	private void waitToStart() {
+		cur_state = GhostState.STARTING;
+		start_timer.Start();
+		navigation_agent.TargetPosition = movement_targets.at_home_targets[cur_home_index].Position;
 	}
 
 	private void scatter() {
+		if(scatter_timer.IsStopped()) {
+			scatter_timer.Start();
+		}
 		cur_state = GhostState.SCATTER;
 		navigation_agent.TargetPosition = movement_targets.scatter_targets[cur_scatter_index].Position;
 	}
@@ -119,8 +134,15 @@ public partial class Ghost : Area2D {
 			body.normal();
 			body.Show();
 			startChase();
+		} else if(cur_state == GhostState.STARTING) {
+			moveToNextHome();
 		}
 		
+	}
+
+	private void moveToNextHome() {
+		cur_home_index = cur_home_index == 0 ? 1 : 0;
+		navigation_agent.TargetPosition = movement_targets.at_home_targets[cur_home_index].Position;
 	}
 
 	private void OnScatterTimeout() {
@@ -140,21 +162,20 @@ public partial class Ghost : Area2D {
 		navigation_agent.TargetPosition = chase_target.Position;
 	}
 
-	public void runAway() {
-		if(cur_state == GhostState.EATEN) {
+	public void bigPelletEaten() {
+		if(cur_state == GhostState.EATEN || cur_state == GhostState.STARTING) {
 			return;
 		}
-		if(runaway_timer.IsStopped()) {
-			runaway_timer.Start();
-			cur_state = GhostState.RUNAWAY;
-			update_chase.Stop();
-			scatter_timer.Stop();
-			body.runningAway();
-			eyes.hideEyes();
-		}
+		cur_state = GhostState.RUNAWAY;
+		update_chase.Stop();
+		scatter_timer.Stop();
+		runaway_timer.Start();
+		body.runningAway();
+		eyes.hideEyes();
+	}
 
+	private void runAway() {
 		Vector2 empty_cell_pos = tile_map.getRandomEmptyCell();
-		GD.Print(empty_cell_pos);
 		navigation_agent.TargetPosition = empty_cell_pos;
 	}
 
@@ -164,7 +185,6 @@ public partial class Ghost : Area2D {
 	}
 
 	private void OnRunAwayTimeout() {
-		pts_manager.pts_per_ghost = 200;
 		is_blinking = false;
 		runaway_timer.Stop();
 		body.normal();
@@ -179,9 +199,8 @@ public partial class Ghost : Area2D {
 			} else if(cur_state == GhostState.SCATTER || cur_state == GhostState.CHASE) {
 				SetCollisionMaskValue(1, false);
 				update_chase.Stop();
-				((Pacman)body).die();
-				scatter_timer.WaitTime = 600;
 				scatter();
+				((Pacman)body).die();
 			}
 		}
 
@@ -197,5 +216,22 @@ public partial class Ghost : Area2D {
 		runaway_timer.Stop();
 		cur_state = GhostState.EATEN;
 		navigation_agent.TargetPosition = movement_targets.at_home_targets[0].Position;
+	}
+	
+	public void reset() {
+		SetCollisionMaskValue(1, true);
+		scatter_timer.Stop();
+		update_chase.Stop();
+		runaway_timer.Stop();
+		body.normal();
+		body.Show();
+		eyes.showEyes();
+		cur_state = GhostState.STARTING;
+		Position = start_pos.Position;
+		if(start_at_home) {
+			waitToStart();
+		} else {
+			scatter();
+		}
 	}
 }

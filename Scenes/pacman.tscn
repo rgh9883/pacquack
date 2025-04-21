@@ -35,6 +35,23 @@ tracks/0/keys = {
 "values": [ExtResource("1_boqhi")]
 }
 
+[sub_resource type="Animation" id="Animation_opfyu"]
+resource_name = "death"
+length = 2.5
+step = 1.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.45),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [ExtResource("6_0meoa"), ExtResource("7_w7gvo"), ExtResource("8_tgh0f"), ExtResource("9_1ysfh"), ExtResource("10_wy5o0"), ExtResource("11_xmrnd"), ExtResource("12_r1lom"), ExtResource("13_2nxgh"), ExtResource("14_4nfmi"), ExtResource("15_byyhm"), ExtResource("16_c31pa")]
+}
+
 [sub_resource type="Animation" id="Animation_0yby8"]
 resource_name = "default"
 length = 0.45
@@ -50,23 +67,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [ExtResource("4_48koy"), ExtResource("1_boqhi"), ExtResource("5_8oyyt")]
-}
-
-[sub_resource type="Animation" id="Animation_opfyu"]
-resource_name = "death"
-length = 2.5
-step = 1.0
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:texture")
-tracks/0/interp = 2
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [ExtResource("6_0meoa"), ExtResource("7_w7gvo"), ExtResource("8_tgh0f"), ExtResource("9_1ysfh"), ExtResource("10_wy5o0"), ExtResource("11_xmrnd"), ExtResource("12_r1lom"), ExtResource("13_2nxgh"), ExtResource("14_4nfmi"), ExtResource("15_byyhm"), ExtResource("16_c31pa")]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_f120j"]
@@ -100,3 +100,5 @@ texture = ExtResource("3_n3bqb")
 libraries = {
 "": SubResource("AnimationLibrary_f120j")
 }
+
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="OnAnimFinished"]

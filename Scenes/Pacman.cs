@@ -5,7 +5,10 @@ using System.Linq;
 using System.Xml.XPath;
 
 public partial class Pacman : CharacterBody2D {
-    [Export] public int speed = 300;
+    [Export] int speed = 300;
+    [Export] Marker2D start_pos;
+    [Signal] public delegate void DeathBeginEventHandler();
+    [Signal] public delegate void DeathEndEventHandler();
     Vector2 movement_direction = Vector2.Zero;
     Vector2 next_movement_direction = Vector2.Zero;
     PhysicsShapeQueryParameters2D shape_query = new PhysicsShapeQueryParameters2D();
@@ -75,8 +78,26 @@ public partial class Pacman : CharacterBody2D {
     }
 
     public void die() {
+        RotationDegrees = 0;
         SetProcess(false);
+        EmitSignal(nameof(DeathBegin));
         animation_player.Play("death");
+    }
+
+    private void OnAnimFinished(StringName anim_name) {
+        if(anim_name == "death") {
+            EmitSignal(nameof(DeathEnd));
+            resetPlayer();
+        }
+    }
+
+    private void resetPlayer() {
+        SetProcess(true);
+        animation_player.Play("default");
+        next_movement_direction = Vector2.Zero;
+        movement_direction = Vector2.Zero;
+        Velocity = Vector2.Zero;
+        Position = start_pos.Position;
     }
 }
 

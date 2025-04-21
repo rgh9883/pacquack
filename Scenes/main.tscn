@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://bn02v31utf15"]
+[gd_scene load_steps=33 format=3 uid="uid://bn02v31utf15"]
 
 [ext_resource type="Texture2D" uid="uid://di7lt8ehvdxdh" path="res://Assets/Walls/wall_atlas.png" id="1_pl8g4"]
 [ext_resource type="PackedScene" uid="uid://ble10bjfxmw0o" path="res://Scenes/pacman.tscn" id="2_dt4ri"]
@@ -10,7 +10,10 @@
 [ext_resource type="PackedScene" uid="uid://cr50j2ujx24f" path="res://Scenes/win_screen.tscn" id="7_0fcxi"]
 [ext_resource type="PackedScene" uid="uid://dl17o1sskensj" path="res://Scenes/ghost.tscn" id="8_48p15"]
 [ext_resource type="Resource" uid="uid://bfg10pb4xqo75" path="res://Resources/red_movement_targets.tres" id="9_xm3mg"]
+[ext_resource type="Resource" uid="uid://dbkrtannd66ya" path="res://Resources/yellow_movement_targets.tres" id="11_jwy7s"]
 [ext_resource type="Script" path="res://Scenes/PointsManager.cs" id="11_swx0e"]
+[ext_resource type="Resource" uid="uid://bahbthvlbubx5" path="res://Resources/blue_movement_targets.tres" id="12_c7usp"]
+[ext_resource type="Resource" uid="uid://d2mymlhrmd0b8" path="res://Resources/pink_movement_targets.tres" id="13_wipox"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_p145y"]
 vertices = PackedVector2Array(-10.5, 12, -12, 12, -12, -12, -10.5, -12)
@@ -367,14 +370,15 @@ script = ExtResource("2_fevh7")
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(0.812, 0.812)
 
-[node name="Player" parent="." instance=ExtResource("2_dt4ri")]
+[node name="Player" parent="." node_paths=PackedStringArray("start_pos") instance=ExtResource("2_dt4ri")]
 position = Vector2(0, 204)
 scale = Vector2(3.4, 3.4)
 collision_mask = 14
+start_pos = NodePath("../Targets/PlayerStartPos")
 
 [node name="Pellets" type="Node" parent="." node_paths=PackedStringArray("ghosts", "pts_manager")]
 script = ExtResource("3_7djv8")
-ghosts = [NodePath("../Ghosts/RedGhost")]
+ghosts = [NodePath("../Ghosts/RedGhost"), NodePath("../Ghosts/YellowGhost"), NodePath("../Ghosts/BlueGhost"), NodePath("../Ghosts/PinkGhost")]
 pts_manager = NodePath("../PointsManager")
 
 [node name="Pellet" parent="Pellets" instance=ExtResource("3_1avvk")]
@@ -1133,7 +1137,7 @@ position = Vector2(300, 204)
 
 [node name="Ghosts" type="Node" parent="."]
 
-[node name="RedGhost" parent="Ghosts" node_paths=PackedStringArray("tile_map", "chase_target", "pts_manager") instance=ExtResource("8_48p15")]
+[node name="RedGhost" parent="Ghosts" node_paths=PackedStringArray("tile_map", "chase_target", "pts_manager", "start_pos") instance=ExtResource("8_48p15")]
 position = Vector2(0, -84)
 scale = Vector2(3, 3)
 movement_targets = ExtResource("9_xm3mg")
@@ -1141,32 +1145,167 @@ tile_map = NodePath("../../TileMap")
 color = Color(1, 0, 0, 1)
 chase_target = NodePath("../../Player")
 pts_manager = NodePath("../../PointsManager")
+start_pos = NodePath("../../Targets/RedGhost/StartPos")
+
+[node name="YellowGhost" parent="Ghosts" node_paths=PackedStringArray("tile_map", "chase_target", "pts_manager", "start_timer", "start_pos") instance=ExtResource("8_48p15")]
+scale = Vector2(3, 3)
+movement_targets = ExtResource("11_jwy7s")
+tile_map = NodePath("../../TileMap")
+color = Color(1, 1, 0, 1)
+chase_target = NodePath("../../Player")
+pts_manager = NodePath("../../PointsManager")
+start_at_home = true
+start_timer = NodePath("../Timers/YellowGhostTimer")
+start_pos = NodePath("../../Targets/YellowGhost/StartPos")
+
+[node name="BlueGhost" parent="Ghosts" node_paths=PackedStringArray("tile_map", "chase_target", "pts_manager", "start_timer", "start_pos") instance=ExtResource("8_48p15")]
+position = Vector2(48, 0)
+scale = Vector2(3, 3)
+movement_targets = ExtResource("12_c7usp")
+tile_map = NodePath("../../TileMap")
+color = Color(0.345098, 1, 1, 1)
+chase_target = NodePath("../../Player")
+pts_manager = NodePath("../../PointsManager")
+start_at_home = true
+start_timer = NodePath("../Timers/BlueGhostTimer")
+start_pos = NodePath("../../Targets/BlueGhost/StartPos")
+
+[node name="PinkGhost" parent="Ghosts" node_paths=PackedStringArray("tile_map", "chase_target", "pts_manager", "start_timer", "start_pos") instance=ExtResource("8_48p15")]
+position = Vector2(-48, 0)
+scale = Vector2(3, 3)
+movement_targets = ExtResource("13_wipox")
+tile_map = NodePath("../../TileMap")
+color = Color(0.992157, 0.662745, 1, 1)
+chase_target = NodePath("../../Player")
+pts_manager = NodePath("../../PointsManager")
+start_at_home = true
+start_timer = NodePath("../Timers/PinkGhostTimer")
+start_pos = NodePath("../../Targets/PinkGhost/StartPos")
+
+[node name="Timers" type="Node" parent="Ghosts"]
+
+[node name="YellowGhostTimer" type="Timer" parent="Ghosts/Timers"]
+wait_time = 4.0
+one_shot = true
+
+[node name="BlueGhostTimer" type="Timer" parent="Ghosts/Timers"]
+wait_time = 8.0
+one_shot = true
+
+[node name="PinkGhostTimer" type="Timer" parent="Ghosts/Timers"]
+wait_time = 12.0
+one_shot = true
 
 [node name="Targets" type="Node" parent="."]
 
-[node name="Red_Ghost" type="Node" parent="Targets"]
+[node name="RedGhost" type="Node" parent="Targets"]
 
-[node name="Scatter" type="Node" parent="Targets/Red_Ghost"]
+[node name="Scatter" type="Node" parent="Targets/RedGhost"]
 
-[node name="Red1" type="Marker2D" parent="Targets/Red_Ghost/Scatter"]
+[node name="Red1" type="Marker2D" parent="Targets/RedGhost/Scatter"]
 position = Vector2(-180, -228)
 
-[node name="Red2" type="Marker2D" parent="Targets/Red_Ghost/Scatter"]
+[node name="Red2" type="Marker2D" parent="Targets/RedGhost/Scatter"]
 position = Vector2(-300, -228)
 
-[node name="Red3" type="Marker2D" parent="Targets/Red_Ghost/Scatter"]
+[node name="Red3" type="Marker2D" parent="Targets/RedGhost/Scatter"]
 position = Vector2(-300, -324)
 
-[node name="Red4" type="Marker2D" parent="Targets/Red_Ghost/Scatter"]
+[node name="Red4" type="Marker2D" parent="Targets/RedGhost/Scatter"]
 position = Vector2(-180, -324)
 
-[node name="Home" type="Node" parent="Targets/Red_Ghost"]
+[node name="Home" type="Node" parent="Targets/RedGhost"]
 
-[node name="Bottom" type="Marker2D" parent="Targets/Red_Ghost/Home"]
+[node name="Bottom" type="Marker2D" parent="Targets/RedGhost/Home"]
 position = Vector2(-48, 0)
 
-[node name="Top" type="Marker2D" parent="Targets/Red_Ghost/Home"]
+[node name="Top" type="Marker2D" parent="Targets/RedGhost/Home"]
 position = Vector2(-48, -24)
 
-[node name="PointsManager" type="Node" parent="."]
+[node name="StartPos" type="Marker2D" parent="Targets/RedGhost"]
+position = Vector2(0, -84)
+
+[node name="YellowGhost" type="Node" parent="Targets"]
+
+[node name="Scatter" type="Node" parent="Targets/YellowGhost"]
+
+[node name="Yellow1" type="Marker2D" parent="Targets/YellowGhost/Scatter"]
+position = Vector2(180, -228)
+
+[node name="Yellow2" type="Marker2D" parent="Targets/YellowGhost/Scatter"]
+position = Vector2(180, -324)
+
+[node name="Yellow3" type="Marker2D" parent="Targets/YellowGhost/Scatter"]
+position = Vector2(300, -324)
+
+[node name="Yellow4" type="Marker2D" parent="Targets/YellowGhost/Scatter"]
+position = Vector2(300, -228)
+
+[node name="Home" type="Node" parent="Targets/YellowGhost"]
+
+[node name="Top" type="Marker2D" parent="Targets/YellowGhost/Home"]
+position = Vector2(0, -24)
+
+[node name="Bottom" type="Marker2D" parent="Targets/YellowGhost/Home"]
+position = Vector2(0, -2)
+
+[node name="StartPos" type="Marker2D" parent="Targets/YellowGhost"]
+
+[node name="BlueGhost" type="Node" parent="Targets"]
+
+[node name="Scatter" type="Node" parent="Targets/BlueGhost"]
+
+[node name="Blue1" type="Marker2D" parent="Targets/BlueGhost/Scatter"]
+position = Vector2(180, 132)
+
+[node name="Blue2" type="Marker2D" parent="Targets/BlueGhost/Scatter"]
+position = Vector2(300, 132)
+
+[node name="Blue3" type="Marker2D" parent="Targets/BlueGhost/Scatter"]
+position = Vector2(252, 276)
+
+[node name="Blue4" type="Marker2D" parent="Targets/BlueGhost/Scatter"]
+position = Vector2(180, 276)
+
+[node name="Home" type="Node" parent="Targets/BlueGhost"]
+
+[node name="Top" type="Marker2D" parent="Targets/BlueGhost/Home"]
+position = Vector2(48, -24)
+
+[node name="Bottom" type="Marker2D" parent="Targets/BlueGhost/Home"]
+position = Vector2(48, 0)
+
+[node name="StartPos" type="Marker2D" parent="Targets/BlueGhost"]
+position = Vector2(48, 0)
+
+[node name="PinkGhost" type="Node" parent="Targets"]
+
+[node name="Scatter" type="Node" parent="Targets/PinkGhost"]
+
+[node name="Pink1" type="Marker2D" parent="Targets/PinkGhost/Scatter"]
+position = Vector2(-180, 132)
+
+[node name="Pink2" type="Marker2D" parent="Targets/PinkGhost/Scatter"]
+position = Vector2(-300, 132)
+
+[node name="Pink3" type="Marker2D" parent="Targets/PinkGhost/Scatter"]
+position = Vector2(-252, 276)
+
+[node name="Pink4" type="Marker2D" parent="Targets/PinkGhost/Scatter"]
+position = Vector2(-180, 276)
+
+[node name="StartPos" type="Marker2D" parent="Targets/PinkGhost"]
+position = Vector2(-48, 0)
+
+[node name="PlayerStartPos" type="Marker2D" parent="Targets"]
+position = Vector2(0, 204)
+
+[node name="PointsManager" type="Node" parent="." node_paths=PackedStringArray("ghosts")]
 script = ExtResource("11_swx0e")
+ghosts = [NodePath("../Ghosts/RedGhost"), NodePath("../Ghosts/YellowGhost"), NodePath("../Ghosts/BlueGhost"), NodePath("../Ghosts/PinkGhost")]
+
+[connection signal="DeathBegin" from="Player" to="PointsManager" method="OnDeathBegin"]
+[connection signal="DeathEnd" from="Player" to="PointsManager" method="OnDeathEnd"]
+[connection signal="timeout" from="Ghosts/Timers/YellowGhostTimer" to="Ghosts/YellowGhost" method="scatter"]
+[connection signal="timeout" from="Ghosts/Timers/BlueGhostTimer" to="Ghosts/BlueGhost" method="scatter"]
+[connection signal="timeout" from="Ghosts/Timers/PinkGhostTimer" to="Ghosts/PinkGhost" method="scatter"]

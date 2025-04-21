@@ -29,7 +29,7 @@ public partial class PelletsManager : Node {
 		if(can_eat_ghosts) {
 			pts_manager.pts_per_ghost = 200;
 			foreach(Ghost ghost in ghosts) {
-				ghost.runAway();
+				ghost.bigPelletEaten();
 			}
 		}
 
