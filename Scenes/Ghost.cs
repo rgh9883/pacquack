@@ -1,10 +1,12 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 public partial class Ghost : Area2D {
-	[Export] movement_targets movement_targets;
+	[Export] NodePath[] scatter_target_paths;
+	[Export] NodePath[] at_home_target_paths;
 	[Export] TileMap tile_map;
 	[Export] public Color color;
 	[Export] Node2D chase_target;
@@ -36,6 +38,8 @@ public partial class Ghost : Area2D {
 	private int cur_scatter_index = 0;
 	private int cur_home_index = 0;
 	private int speed;
+	private List<Marker2D> scatter_targets = new List<Marker2D>();
+	private List<Marker2D> at_home_targets = new List<Marker2D>();
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
@@ -51,6 +55,18 @@ public partial class Ghost : Area2D {
 		eyes = GetNode<GhostEyesSprite>("EyesSprite");
 
 		points = GetNode<Label>("PointsLabel");
+
+		foreach(NodePath path in scatter_target_paths) {
+			GD.Print(path);
+			GD.Print(GetNode<Marker2D>(path));
+        	Marker2D marker = GetNode<Marker2D>(path);
+            scatter_targets.Add(marker);
+    	}
+
+		foreach(NodePath path in at_home_target_paths) {
+        	Marker2D marker = GetNode<Marker2D>(path);
+            at_home_targets.Add(marker);
+    	}
 
 		speed = Global.Instance.GhostSpeed;
 	}
@@ -109,7 +125,7 @@ public partial class Ghost : Area2D {
 	private void waitToStart() {
 		cur_state = GhostState.STARTING;
 		start_timer.Start();
-		navigation_agent.TargetPosition = movement_targets.at_home_targets[cur_home_index].Position;
+		navigation_agent.TargetPosition = at_home_targets[cur_home_index].Position;
 	}
 
 	private void scatter() {
@@ -117,7 +133,7 @@ public partial class Ghost : Area2D {
 			scatter_timer.Start();
 		}
 		cur_state = GhostState.SCATTER;
-		navigation_agent.TargetPosition = movement_targets.scatter_targets[cur_scatter_index].Position;
+		navigation_agent.TargetPosition = scatter_targets[cur_scatter_index].Position;
 	}
 
 	private void OnPositionReached() {
@@ -143,7 +159,7 @@ public partial class Ghost : Area2D {
 
 	private void moveToNextHome() {
 		cur_home_index = cur_home_index == 0 ? 1 : 0;
-		navigation_agent.TargetPosition = movement_targets.at_home_targets[cur_home_index].Position;
+		navigation_agent.TargetPosition = at_home_targets[cur_home_index].Position;
 	}
 
 	private void OnScatterTimeout() {
@@ -216,7 +232,7 @@ public partial class Ghost : Area2D {
 		points.Hide();
 		runaway_timer.Stop();
 		cur_state = GhostState.EATEN;
-		navigation_agent.TargetPosition = movement_targets.at_home_targets[0].Position;
+		navigation_agent.TargetPosition = at_home_targets[0].Position;
 	}
 	
 	public void reset() {
