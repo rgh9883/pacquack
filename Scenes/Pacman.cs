@@ -20,9 +20,9 @@ public partial class Pacman : CharacterBody2D {
         direction_pointer = GetNode<Sprite2D>("DirectionPointer");
         collisionShape2D = GetNode<CollisionShape2D>("CollisionShape2D");
         animation_player = GetNode<AnimationPlayer>("AnimationPlayer");
-        animation_player.Play("default");
         shape_query.Shape = collisionShape2D.Shape;
         shape_query.CollisionMask = 2;
+        SetProcess(false);
     }
 
     public override void _Process(double delta) {
@@ -92,12 +92,16 @@ public partial class Pacman : CharacterBody2D {
     }
 
     private void resetPlayer() {
-        SetProcess(true);
         animation_player.Play("default");
         next_movement_direction = Vector2.Zero;
         movement_direction = Vector2.Zero;
         Velocity = Vector2.Zero;
         Position = start_pos.Position;
+    }
+
+    private void OnStartTimer() {
+        SetProcess(true);
+        animation_player.Play("default");
     }
 }
 

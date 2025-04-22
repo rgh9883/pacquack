@@ -105,6 +105,7 @@ script = ExtResource("3_k5tgj")
 
 [node name="EyesSprite" type="Sprite2D" parent="."]
 texture_filter = 1
+texture = ExtResource("8_qckxs")
 script = ExtResource("5_wmt3p")
 up = ExtResource("6_ethgl")
 down = ExtResource("2_patml")

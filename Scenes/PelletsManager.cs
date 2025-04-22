@@ -9,8 +9,6 @@ public partial class PelletsManager : Node {
 	[Export] Ghost[] ghosts;
 	[Export] PointsManager pts_manager;
 
-	[Signal] public delegate void AllPelletsEatenEventHandler();
-
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
 		Node[] pellets = GetChildren().ToArray();
@@ -34,7 +32,8 @@ public partial class PelletsManager : Node {
 		}
 
 		if(pellets_eaten == total_pellets_count) {
-			EmitSignal(nameof(AllPelletsEaten));
+			Global.Instance.GhostSpeed += 40;
+			GetTree().ReloadCurrentScene();
 			return;
 		}
 	}

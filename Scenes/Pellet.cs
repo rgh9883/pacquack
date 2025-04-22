@@ -16,6 +16,7 @@ public partial class Pellet : Area2D {
 
 	private void OnBodyEntered(Node body) {
 		if(body is Pacman) {
+			Global.Instance.Score += 10;
 			EmitSignal(nameof(PelletEaten), can_eat_ghosts);
             QueueFree();
 		}

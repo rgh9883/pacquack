@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 public partial class PointsManager : Node {
 	[Export] Ghost[] ghosts;
+	[Export] Timer start_timer;
+	[Export] Label start_label;
 	public int pts_per_ghost {get; set;} = 200;
-	public int lives {get; set;} = 3;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
 	}
@@ -16,6 +17,7 @@ public partial class PointsManager : Node {
 	}
 
 	public async Task OnGhostEaten() {
+		Global.Instance.Score += pts_per_ghost;
 		pts_per_ghost += 200;
 		GetTree().Paused = true;
 		await ToSignal(GetTree().CreateTimer(1.0), "timeout");
@@ -23,7 +25,7 @@ public partial class PointsManager : Node {
 	}
 
 	private void OnDeathBegin() {
-		lives--;
+		Global.Instance.Lives--;
 		pts_per_ghost = 200;
 
 		foreach(Ghost ghost in ghosts) {
@@ -32,9 +34,15 @@ public partial class PointsManager : Node {
 	}
 
 	private void OnDeathEnd() {
+		if(Global.Instance.Lives == 0) {
+			GetTree().ChangeSceneToFile("res://Scenes/end.tscn");
+			return;
+		}
 		foreach(Ghost ghost in ghosts) {
 			ghost.ProcessMode = ProcessModeEnum.Inherit;
 			ghost.reset();
 		}
+		start_timer.Start();
+		start_label.Show();
 	}
 }

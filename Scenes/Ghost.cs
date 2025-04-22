@@ -1,10 +1,9 @@
 using Godot;
 using System;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 public partial class Ghost : Area2D {
-	[Export] int speed = 120;
-	[Export] int eaten_speed = 240;
 	[Export] movement_targets movement_targets;
 	[Export] TileMap tile_map;
 	[Export] public Color color;
@@ -33,9 +32,10 @@ public partial class Ghost : Area2D {
 	private GhostEyesSprite eyes;
 	private Label points;
 	private bool is_blinking = false;
-	private bool no_moving = false;
+	private bool no_moving = true;
 	private int cur_scatter_index = 0;
 	private int cur_home_index = 0;
+	private int speed;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
@@ -52,7 +52,7 @@ public partial class Ghost : Area2D {
 
 		points = GetNode<Label>("PointsLabel");
 
-		CallDeferred("setup");
+		speed = Global.Instance.GhostSpeed;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -68,7 +68,7 @@ public partial class Ghost : Area2D {
 
 	private void moveGhost(Vector2 next_pos, double delta) {
 		Vector2 cur_agent_pos = GlobalPosition;
-		int cur_speed = cur_state == GhostState.EATEN ? eaten_speed : speed;
+		int cur_speed = cur_state == GhostState.EATEN ? (2 * speed) : speed;
 		Vector2 new_velo = (next_pos - cur_agent_pos).Normalized() * cur_speed * (float) delta;
 
 		Position += new_velo;
@@ -96,6 +96,7 @@ public partial class Ghost : Area2D {
 	}
 
 	private void setup() {
+		no_moving = false;
 		navigation_agent.SetNavigationMap(tile_map.GetNavigationMap(0));
 		NavigationServer2D.AgentSetMap(navigation_agent.GetRid(), tile_map.GetNavigationMap(0));
 		if(start_at_home) {
@@ -228,10 +229,10 @@ public partial class Ghost : Area2D {
 		eyes.showEyes();
 		cur_state = GhostState.STARTING;
 		Position = start_pos.Position;
-		if(start_at_home) {
-			waitToStart();
-		} else {
-			scatter();
-		}
+		no_moving = true;
+	}
+
+	private void OnStartTimer() {
+		CallDeferred("setup");
 	}
 }

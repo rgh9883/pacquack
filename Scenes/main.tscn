@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://bn02v31utf15"]
+[gd_scene load_steps=35 format=3 uid="uid://bn02v31utf15"]
 
 [ext_resource type="Texture2D" uid="uid://di7lt8ehvdxdh" path="res://Assets/Walls/wall_atlas.png" id="1_pl8g4"]
 [ext_resource type="PackedScene" uid="uid://ble10bjfxmw0o" path="res://Scenes/pacman.tscn" id="2_dt4ri"]
@@ -7,13 +7,15 @@
 [ext_resource type="Script" path="res://Scenes/PelletsManager.cs" id="3_7djv8"]
 [ext_resource type="PackedScene" uid="uid://bdj14ftai2ehf" path="res://Scenes/large_pellet.tscn" id="4_jp8fd"]
 [ext_resource type="PackedScene" uid="uid://dic23rle6vmhy" path="res://Scenes/connector.tscn" id="5_50ast"]
-[ext_resource type="PackedScene" uid="uid://cr50j2ujx24f" path="res://Scenes/win_screen.tscn" id="7_0fcxi"]
 [ext_resource type="PackedScene" uid="uid://dl17o1sskensj" path="res://Scenes/ghost.tscn" id="8_48p15"]
 [ext_resource type="Resource" uid="uid://bfg10pb4xqo75" path="res://Resources/red_movement_targets.tres" id="9_xm3mg"]
 [ext_resource type="Resource" uid="uid://dbkrtannd66ya" path="res://Resources/yellow_movement_targets.tres" id="11_jwy7s"]
 [ext_resource type="Script" path="res://Scenes/PointsManager.cs" id="11_swx0e"]
 [ext_resource type="Resource" uid="uid://bahbthvlbubx5" path="res://Resources/blue_movement_targets.tres" id="12_c7usp"]
 [ext_resource type="Resource" uid="uid://d2mymlhrmd0b8" path="res://Resources/pink_movement_targets.tres" id="13_wipox"]
+[ext_resource type="Theme" uid="uid://fylxmovyq1sf" path="res://Scenes/label.tres" id="15_wk24w"]
+[ext_resource type="Script" path="res://Scenes/StartLabel.cs" id="16_44vq8"]
+[ext_resource type="Script" path="res://Scenes/ScoreLabel.cs" id="16_grcme"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_p145y"]
 vertices = PackedVector2Array(-10.5, 12, -12, 12, -12, -12, -10.5, -12)
@@ -1133,8 +1135,6 @@ position = Vector2(300, 204)
 
 [node name="Connector" parent="." instance=ExtResource("5_50ast")]
 
-[node name="Win_Screen" parent="." instance=ExtResource("7_0fcxi")]
-
 [node name="Ghosts" type="Node" parent="."]
 
 [node name="RedGhost" parent="Ghosts" node_paths=PackedStringArray("tile_map", "chase_target", "pts_manager", "start_pos") instance=ExtResource("8_48p15")]
@@ -1300,12 +1300,43 @@ position = Vector2(-48, 0)
 [node name="PlayerStartPos" type="Marker2D" parent="Targets"]
 position = Vector2(0, 204)
 
-[node name="PointsManager" type="Node" parent="." node_paths=PackedStringArray("ghosts")]
+[node name="PointsManager" type="Node" parent="." node_paths=PackedStringArray("ghosts", "start_timer", "start_label")]
 script = ExtResource("11_swx0e")
 ghosts = [NodePath("../Ghosts/RedGhost"), NodePath("../Ghosts/YellowGhost"), NodePath("../Ghosts/BlueGhost"), NodePath("../Ghosts/PinkGhost")]
+start_timer = NodePath("../StartTimer")
+start_label = NodePath("../StartLabel")
+
+[node name="ScoreLabel" type="Label" parent="."]
+offset_left = -334.0
+offset_top = -399.0
+offset_right = -168.0
+offset_bottom = -363.0
+theme = ExtResource("15_wk24w")
+text = "Score: 0"
+script = ExtResource("16_grcme")
+
+[node name="StartTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+autostart = true
+
+[node name="StartLabel" type="Label" parent="."]
+offset_left = -63.0
+offset_top = -399.0
+offset_right = 69.0
+offset_bottom = -363.0
+theme = ExtResource("15_wk24w")
+text = "Ready!"
+script = ExtResource("16_44vq8")
 
 [connection signal="DeathBegin" from="Player" to="PointsManager" method="OnDeathBegin"]
 [connection signal="DeathEnd" from="Player" to="PointsManager" method="OnDeathEnd"]
 [connection signal="timeout" from="Ghosts/Timers/YellowGhostTimer" to="Ghosts/YellowGhost" method="scatter"]
 [connection signal="timeout" from="Ghosts/Timers/BlueGhostTimer" to="Ghosts/BlueGhost" method="scatter"]
 [connection signal="timeout" from="Ghosts/Timers/PinkGhostTimer" to="Ghosts/PinkGhost" method="scatter"]
+[connection signal="timeout" from="StartTimer" to="Player" method="OnStartTimer"]
+[connection signal="timeout" from="StartTimer" to="Ghosts/RedGhost" method="OnStartTimer"]
+[connection signal="timeout" from="StartTimer" to="Ghosts/YellowGhost" method="OnStartTimer"]
+[connection signal="timeout" from="StartTimer" to="Ghosts/BlueGhost" method="OnStartTimer"]
+[connection signal="timeout" from="StartTimer" to="Ghosts/PinkGhost" method="OnStartTimer"]
+[connection signal="timeout" from="StartTimer" to="StartLabel" method="OnStartTimer"]
