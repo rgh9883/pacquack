@@ -35,6 +35,7 @@ public partial class Ghost : Area2D {
 	private Label points;
 	private bool is_blinking = false;
 	private bool no_moving = true;
+	private bool blue_at_home = false;
 	private int cur_scatter_index = 0;
 	private int cur_home_index = 0;
 	private int speed;
@@ -57,8 +58,6 @@ public partial class Ghost : Area2D {
 		points = GetNode<Label>("PointsLabel");
 
 		foreach(NodePath path in scatter_target_paths) {
-			GD.Print(path);
-			GD.Print(GetNode<Marker2D>(path));
         	Marker2D marker = GetNode<Marker2D>(path);
             scatter_targets.Add(marker);
     	}
@@ -92,14 +91,14 @@ public partial class Ghost : Area2D {
 		calcDirection(new_velo);
 	}
 
-	private void calcDirection(Godot.Vector2 velocity) {
+	private void calcDirection(Vector2 velocity) {
 		string cur_direction;
-		
-		if(velocity.X > 1) {
+		GD.Print(velocity);
+		if(velocity.X > .1) {
 			cur_direction = "right";
-		} else if(velocity.X < -1) {
+		} else if(velocity.X < -.1) {
 			cur_direction = "left";
-		} else if(velocity.Y > 1) {
+		} else if(velocity.Y > -.1) {
 			cur_direction = "down";
 		} else {
 			cur_direction = "up";
@@ -129,6 +128,12 @@ public partial class Ghost : Area2D {
 	}
 
 	private void scatter() {
+		if(blue_at_home) {
+			cur_state = GhostState.RUNAWAY;
+			blue_at_home = false;
+			runAway();
+			return;
+		}
 		if(scatter_timer.IsStopped()) {
 			scatter_timer.Start();
 		}
@@ -180,15 +185,23 @@ public partial class Ghost : Area2D {
 	}
 
 	public void bigPelletEaten() {
-		if(cur_state == GhostState.EATEN || cur_state == GhostState.STARTING) {
+		if(cur_state == GhostState.EATEN) {
 			return;
 		}
-		cur_state = GhostState.RUNAWAY;
-		update_chase.Stop();
-		scatter_timer.Stop();
-		runaway_timer.Start();
-		body.runningAway();
-		eyes.hideEyes();
+		else if(cur_state == GhostState.STARTING) {
+			blue_at_home = true;
+			body.runningAway();
+			eyes.hideEyes();
+			runaway_timer.Start();
+		} else {
+			cur_state = GhostState.RUNAWAY;
+			update_chase.Stop();
+			scatter_timer.Stop();
+			runaway_timer.Start();
+			body.runningAway();
+			eyes.hideEyes();
+			runAway();
+		}
 	}
 
 	private void runAway() {
@@ -206,7 +219,9 @@ public partial class Ghost : Area2D {
 		runaway_timer.Stop();
 		body.normal();
 		eyes.showEyes();
-		startChase();
+		if(!blue_at_home) {
+			startChase();
+		}
 	}
 
 	private void OnBodyEntered(Node body) {

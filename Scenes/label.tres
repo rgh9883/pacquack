@@ -3,5 +3,6 @@
 [ext_resource type="FontFile" uid="uid://ccnln6n4c0g54" path="res://Assets/Fonts/upheavtt.ttf" id="1_ul785"]
 
 [resource]
+resource_local_to_scene = true
 default_font = ExtResource("1_ul785")
 default_font_size = 40

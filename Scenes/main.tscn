@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://bn02v31utf15"]
+[gd_scene load_steps=32 format=3 uid="uid://bn02v31utf15"]
 
 [ext_resource type="Texture2D" uid="uid://di7lt8ehvdxdh" path="res://Assets/Walls/wall_atlas.png" id="1_pl8g4"]
 [ext_resource type="PackedScene" uid="uid://ble10bjfxmw0o" path="res://Scenes/pacman.tscn" id="2_dt4ri"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://dic23rle6vmhy" path="res://Scenes/connector.tscn" id="5_50ast"]
 [ext_resource type="PackedScene" uid="uid://dl17o1sskensj" path="res://Scenes/ghost.tscn" id="8_48p15"]
 [ext_resource type="Script" path="res://Scenes/PointsManager.cs" id="11_swx0e"]
+[ext_resource type="Script" path="res://Scenes/LivesLabel.cs" id="13_5bq4w"]
 [ext_resource type="Theme" uid="uid://fylxmovyq1sf" path="res://Scenes/label.tres" id="15_wk24w"]
 [ext_resource type="Script" path="res://Scenes/StartLabel.cs" id="16_44vq8"]
 [ext_resource type="Script" path="res://Scenes/ScoreLabel.cs" id="16_grcme"]
@@ -372,6 +373,7 @@ zoom = Vector2(0.812, 0.812)
 position = Vector2(0, 204)
 scale = Vector2(3.4, 3.4)
 collision_mask = 14
+motion_mode = 1
 start_pos = NodePath("../Targets/PlayerStartPos")
 
 [node name="Pellets" type="Node" parent="." node_paths=PackedStringArray("ghosts", "pts_manager")]
@@ -1328,6 +1330,15 @@ offset_bottom = -363.0
 theme = ExtResource("15_wk24w")
 text = "Ready!"
 script = ExtResource("16_44vq8")
+
+[node name="LivesLabel" type="Label" parent="."]
+offset_left = 168.0
+offset_top = -399.0
+offset_right = 332.0
+offset_bottom = -363.0
+theme = ExtResource("15_wk24w")
+text = "Lives: 0"
+script = ExtResource("13_5bq4w")
 
 [connection signal="DeathBegin" from="Player" to="PointsManager" method="OnDeathBegin"]
 [connection signal="DeathEnd" from="Player" to="PointsManager" method="OnDeathEnd"]

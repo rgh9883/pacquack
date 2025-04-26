@@ -32,13 +32,13 @@ action_mode = 0
 text = "Quit"
 
 [node name="Title" type="Label" parent="."]
-offset_left = -360.0
+offset_left = -479.0
 offset_top = -274.0
-offset_right = 380.0
+offset_right = 491.0
 offset_bottom = -94.0
 theme = ExtResource("2_r6lkm")
 theme_override_font_sizes/font_size = 200
-text = "Pacman"
+text = "PacQuack"
 
 [connection signal="pressed" from="StartButton" to="." method="OnStartButtonPressed"]
 [connection signal="pressed" from="QuitButton" to="." method="OnQuitButtonPressed"]
